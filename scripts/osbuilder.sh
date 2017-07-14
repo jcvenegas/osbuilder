@@ -23,12 +23,9 @@ fi
 
 
 SCRIPT_NAME="${0##*/}"
-DNF_CONF="/etc/dnf/clear-dnf.conf"
 SCRIPT_DIR="$(dirname $(realpath -s $0))"
+REPO_URL=${REPO_URL:-https://download.clearlinux.org/current/x86_64/os/}
 
-if [ ! -f "${DNF_CONF}" ]; then
-	DNF_CONF="${SCRIPT_DIR}/clear-dnf.conf"
-fi
 
 
 IMAGE_BUILDER_SH="image_buidler.sh"
@@ -68,8 +65,38 @@ check_program(){
 	type "$1" >/dev/null 2>&1
 }
 
+generate_dnf_config()
+{
+	cat > "${DNF_CONF}" << EOF
+[main]
+cachedir=/var/cache/dnf/clear/
+keepcache=0
+debuglevel=2
+logfile=/var/log/dnf.log
+exactarch=1
+obsoletes=1
+gpgcheck=0
+plugins=0
+installonly_limit=3
+#Dont use the default dnf reposdir
+#this will prevent to use host repositories
+reposdir=/root/mash
+
+[clear]
+name=Clear
+failovermethod=priority
+baseurl=${REPO_URL}
+enabled=1
+gpgcheck=0
+EOF
+}
+
 build_rootfs()
 {
+	if [ ! -f "${DNF_CONF}" ]; then
+		DNF_CONF="/etc/dnf/clear-dnf.conf"
+		generate_dnf_config
+	fi
 	mkdir -p "${ROOTFS_DIR}"
 	if check_program "dnf"; then
 		DNF="dnf"
