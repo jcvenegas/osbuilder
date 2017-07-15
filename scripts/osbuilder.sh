@@ -94,7 +94,7 @@ EOF
 build_rootfs()
 {
 	if [ ! -f "${DNF_CONF}" ]; then
-		DNF_CONF="/etc/dnf/clear-dnf.conf"
+		DNF_CONF="./clear-dnf.conf"
 		generate_dnf_config
 	fi
 	mkdir -p "${ROOTFS_DIR}"
