@@ -1,5 +1,5 @@
-#
-#  Copyright (C) 2017 Intel Corporation
+#!/bin/bash
+#  Copyright (C) 2016 Intel Corporation
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -15,23 +15,15 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-[main]
-cachedir=/var/cache/dnf/clear/
-keepcache=0
-debuglevel=2
-logfile=/var/log/dnf.log
-exactarch=1
-obsoletes=1
-gpgcheck=0
-plugins=0
-installonly_limit=3
-#Dont use the default dnf reposdir
-#this will prevent to use host repositories
-reposdir=/root/mash
+set -e -x
 
-[clear]
-name=Clear
-failovermethod=priority
-baseurl=https://download.clearlinux.org/current/x86_64/os/
-enabled=1
-gpgcheck=0
+root=$(cd `dirname "$0"`/..; pwd -P)
+
+set -e
+set -x
+
+export test_repo="github.com/clearcontainers/tests"
+export test_repo_dir="${GOPATH}/src/${test_repo}"
+
+# Get Clear Containers test
+go get "${test_repo}"

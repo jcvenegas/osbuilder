@@ -17,13 +17,13 @@
 
 From fedora:25
 
-RUN dnf install -y qemu-img parted gdisk make gcc bc
+RUN dnf install -y qemu-img parted gdisk make gcc bc git
 
 ENV workdir /osbuilder
 WORKDIR ${workdir}
 
 COPY osbuilder.sh         /usr/bin
 COPY image_builder.sh     /usr/bin
-COPY clear-dnf.conf       /etc/dnf
+COPY kernel_builder.sh    /usr/bin
 
 ENTRYPOINT ["/usr/bin/osbuilder.sh"]
