@@ -33,6 +33,10 @@ if ! type ${IMAGE_BUILDER_SH} >/dev/null 2>&1; then
 	IMAGE_BUILDER_SH="${SCRIPT_DIR}/image_builder.sh"
 fi
 
+KERNEL_BUILDER_SH="kernel_builder.sh"
+if ! type ${KERNEL_BUILDER_SH} >/dev/null 2>&1; then
+	KERNEL_BUILDER_SH="${SCRIPT_DIR}/kernel_builder.sh"
+fi
 
 BUILD="$1"
 ROOTFS_DIR="$(pwd)/rootfs"
@@ -54,9 +58,10 @@ usage()
 {
 	cat <<EOT
 Usage: ${SCRIPT_NAME} rootfs|kernel|image
-rootfs : Build a rootfs based on Clear Linux packages
-kernel : Build a kernel for clear containers
-image  : Build a Clear Containers image based on rootfs directory
+rootfs     : Build a rootfs based on Clear Linux packages
+kernel-src : Pull latest kernel source for clear containers
+kernel     : Build a kernel for clear containers
+image      : Build a Clear Containers image based on rootfs directory
 EOT
 	exit 1
 } 
@@ -111,13 +116,6 @@ build_rootfs()
 	[ -n "${ROOTFS_DIR}" ]  && rm -r "${ROOTFS_DIR}/var/cache/dnf"
 }
 
-build_kernel()
-{
-	pushd linux
-	make -j"$(nproc)"
-	popd
-	cp linux/vmlinux vmlinux.container
-}
 
 check_root()
 {
@@ -136,9 +134,19 @@ case "$BUILD" in
 			check_root
 			build_rootfs
             ;;
+
+        kernel-src)
+			$KERNEL_BUILDER_SH prepare
+            ;;
          
         kernel)
-			build_kernel
+			$KERNEL_BUILDER_SH build
+			rm -f vmlinux.container
+			rm -f vmlinuz.container
+			cp linux/vmlinux vmlinux.container
+			cp linux/arch/x86/boot/bzImage vmlinuz.container
+			info "vmlinux kernel ready in vmlinux.container"
+			info "vmlinuz kernel ready in vmlinuz.container"
             ;;
          
         image)

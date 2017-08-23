@@ -51,19 +51,16 @@ rootfs: $(WORKDIR) $(DOCKER_DEPS)
 image: rootfs $(WORKDIR) $(DOCKER_DEPS)
 	cd $(WORKDIR) && $(OS_BUILDER) image
 
-kernel: $(WORKDIR)/linux docker-build $(DOCKER_DEPS)
+kernel: $(DOCKER_DEPS)
 	cd $(WORKDIR) && $(OS_BUILDER) kernel
+
+kernel-src: $(WORKDIR) $(DOCKER_DEPS)
+	cd $(WORKDIR) && $(OS_BUILDER) kernel-src
 
 docker-build:
 	cd scripts; \
 	docker build $(BUILD_PROXY) -t $(IMAGE_BUILDER) . 
 
-$(WORKDIR)/linux: $(WORKDIR)
-	@echo Clone container kernel from $(KERNEL_REPO);\
-	cd $(WORKDIR); \
-	git clone --depth=1 $(KERNEL_REPO); \
-	cd linux; \
-	make clear_containers_defconfig;
 
 $(WORKDIR):
 	mkdir -p $(WORKDIR)
@@ -85,6 +82,7 @@ else
 	@$(call check_program,make)
 	@$(call check_program,gcc)
 	@$(call check_program,bc)
+	@$(call check_program,git)
 endif
 
 help:
@@ -117,5 +115,8 @@ help:
 	@echo "kernel: compiles the kernel source from the directory WORKDIR/linux and"
 	@echo "        copies the vmlinux image to WORKDIR/vmlinux.container. If the source "
 	@echo "        WORKDIR/linux does not exist, it will clone it from $(KERNEL_REPO)."
+	@echo ""
+	@echo "kernel-src: Setup kernel source in directory WORKDIR/linux."
+	@echo "            The kernel source will be used by kernel target to build it."
 
 
