@@ -116,7 +116,7 @@ build_rootfs()
 	fi
 	DNF="$DNF --config=$DNF_CONF -y --installroot=${ROOTFS_DIR} --noplugins"
 	$DNF install systemd hyperstart cc-oci-runtime-extras coreutils-bin \
-		systemd-bootchart iptables-bin clear-containers-agent ${EXTRA_PKGS}
+		systemd-bootchart iptables-bin clear-containers-agent bash-bin ${EXTRA_PKGS}
 	[ -n "${ROOTFS_DIR}" ]  && rm -r "${ROOTFS_DIR}/var/cache/dnf"
 }
 
