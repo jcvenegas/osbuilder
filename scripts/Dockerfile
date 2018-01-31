@@ -17,7 +17,7 @@
 
 From fedora:27
 
-RUN dnf install -y qemu-img parted gdisk make gcc bc git e2fsprogs libudev-devel pkgconfig
+RUN dnf update -d 3 -y  && dnf -d 3 install -y qemu-img parted gdisk make gcc bc git e2fsprogs libudev-devel pkgconfig
 
 ARG GO_VERSION
 
